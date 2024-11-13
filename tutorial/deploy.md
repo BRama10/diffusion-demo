@@ -1,194 +1,162 @@
-# Creating an On-Demand Deployment on Fireworks AI
+# Deploying Custom Model Endpoints on RunPod
 
-This guide will walk you through creating your first deployment on Fireworks AI.
+## Introduction
 
-## Step 1: Create a Fireworks AI Account
+RunPod offers a powerful serverless platform for deploying AI models and endpoints with GPU acceleration. This guide will walk you through the process of setting up and deploying serverless endpoints on RunPod.
 
-1. Visit [fireworks.ai](https://fireworks.ai)
-2. Click on "Sign Up" to create a new account
-3. Complete the registration process
-4. Login to your account
+## Understanding the Dashboard
 
-## Step 2: Navigate to Deployments
+![RunPod Dashboard](./assets/image1.png)
 
-1. Go to [fireworks.ai/dashboard/deployments](https://fireworks.ai/dashboard/deployments)
-2. You'll see the Getting Started page for deployments
+The RunPod dashboard provides three main services:
+1. **GPU Cloud**: Deploy individual GPU pods
+2. **Serverless**: Autoscale your workload with traffic (< 250ms cold-start)
+3. **Storage**: Share network storage among your pods
 
-![Getting Started Page](./assets/image1.png)
-_The deployments dashboard shows options for creating new deployments and exploring available models_
+## Setting Up a Serverless Endpoint
 
-On this page, you can see:
+### Step 1: Choose a Template
 
-- Instructions for deploying models
-- Benefits of deployments like predictable performance and no rate limits
-- Available models like Llama 3.1 (40B, 70B, and 8B versions)
-- Option to create a new deployment via the "Get Started" button
+Select the Serverless tab.
 
-## Step 3: Select a Base Model
+![Serverless Templates](./assets/image2.png)
 
-Click "Get Started" to begin creating a new deployment.
+RunPod offers several pre-configured templates for quick deployment:
 
-![Model Selection](./assets/image2.png)
-_The model selection screen lets you choose your base model_
+1. **Serverless SGLang**: Fast-serving framework for large language models
+2. **Serverless vLLM**: Deploy OpenAI-compatible Large Language Models
+3. **Infinity Vector Embeddings**: Text embedding models
+4. **Faster Whisper**: Fast speech-to-text using CTranslate2
+5. **SD Automatic1111**: Stable Diffusion web interface
+6. **Stable Diffusion XL**: Text-to-image generation at 1024×1024
 
-1. You'll see a 4-step process:
+However, for the newest model we need to use the custom container, so choose New Endpoint.
 
-   - Model (current step)
-   - Performance
-   - Scaling
-   - Metadata
+### Step 2: Configure GPU Endpoint
 
-2. In the Model selection screen:
-   - Click the "Select base model" dropdown
-   - Choose your desired model (One of the Diffusion ones)
-   - You can also upload a custom model using the "Upload a custom model" link
-   - Click "Continue" once you've made your selection
+![GPU Configuration](./assets/image3.png)
 
-## Step 4: Configure Performance
+When creating a new endpoint, you'll need to:
 
-After selecting your model, you'll configure performance settings.
+1. Choose an endpoint name (e.g., "informal_green_firefly")
+2. Select GPU configuration:
+   - Either 24GB, 24BG Pro, or 48GB should work.
 
-![Performance Configuration](./assets/image3.png)
-_The performance configuration screen lets you set up GPU and optimization options_
-_Use defaults for now since adding more increases price_
+### Step 3: Worker Configuration
 
-Key settings here include:
+![Worker Settings](./assets/image4.png)
 
-1. Accelerator Type
+Configure your worker settings:
 
-   - Choose between different GPU types (A100s vs H100s)
-   - A100s are more affordable
-   - H100s offer better latency and capacity
+1. **Active Workers**: Set initial workers (0 for autoscaling)
+2. **Max Workers**: Define scaling limit (e.g., 3)
+3. **GPUs per Worker**: Allocate GPUs (typically 1)
+4. **Idle Timeout**: Set worker shutdown time (e.g., 5 seconds)
+5. **FlashBoot**: Enable for faster startup
 
-2. Accelerator Count
+### Step 4: Container Configuration
 
-   - Set how many GPUs to use per replica
-   - Default is 1 for most models
-   - Increase for better performance or larger models
+![Container Settings](./assets/image5.png)
 
-3. Long Prompts Option
+Final deployment settings:
 
-   - Enable for prompts >3000 tokens
-   - Requires minimum 2 GPUs
-   - Improves performance for long inputs
+1. **Select Template**: Choose from available templates
+2. **Container Image**: Specify the Docker image (for example `thehunter911/stbldiff3.5-medium-runpod-serverless:dev`)
 
-4. PEFT Add-ons
-   - Only enable if using fine-tuned models
-   - Keep disabled unless specifically needed
+### Optional (not needed for here)
 
-## Step 5: Configure Scaling
+3. **Container Registry Credentials**: Add if needed 
+4. **Container Start Command**: Custom startup commands
+5. **Resources**:
+   - Container Disk: Set storage (e.g., 5 GB)
+   - HTTP Ports: Configure exposed ports
+   - TCP Ports: Additional port configuration
+6. **Environment Variables**: Add required env vars
+7. **Advanced Settings**: Additional configurations
 
-After performance settings, you'll configure scaling options.
+## Step 5: Deployment
 
-![Scaling Configuration](./assets/image4.png)
-_The scaling configuration screen lets you set up auto-scaling parameters_
-_Use defaults for now since adding more increases price_
+Once configured, click the "Deploy" button to launch your endpoint. 
 
-Key settings include:
+It might take a bit for the container to reach `Ready` status (top right).
 
-1. Auto-scaling
+# Deploying Serverless Endpoints on RunPod - A Complete Guide
 
-   - Check "Enable auto-scaling" to allow automatic scaling
-   - Helps manage costs and performance
+## Step 6: Getting your API endpoint
 
-2. Min Replicas
+![Endpoint Monitoring](./assets/image6.png)
 
-   - Set minimum number of serving instances
-   - Can be 0 for autoscale-to-zero
-   - Setting 0 means you only pay when used
+After deployment, you can monitor your endpoint's status through the dashboard:
 
-3. Max Replicas
-   - Set maximum number of instances for scaling up
-   - Each replica uses the configured GPU count
-   - Example: max=3 means up to 3 replicas during high load
-   - Set max=1 for now
+Next, get the Run Sync API url endpoint (https://api.runpod.ai/v2/0bsdwum59o4j5d/runsync in the image). Save it somewhere.
 
-## Step 6: Add Metadata
 
-After configuring scaling options, you'll reach the final metadata configuration screen.
+## Step 7: Setting Up API Access
 
-![Metadata Configuration](./assets/image5.png)
-_The metadata screen lets you set the name and description for your deployment_
+![API Keys Management](./assets/image7.png)
 
-1. Set Display Name:
+### Creating an API Key
+1. Navigate to Settings → API Keys
+2. Click "Create API Key"
+3. Your API keys will appear in the table with:
+   - Name
+   - Secret Key (hidden)
+   - Permissions
+   - Usage dates
+   - Status
+4. Make sure to copy your API key and store somewhere since you won't be able to see it again
 
-   - Enter a human-readable name for your deployment
-   - Must be fewer than 64 characters
-   - Example: "diffusion-demo"
-   - This name will be used to identify your deployment
 
-2. Add Description:
 
-   - Provide more detailed information about your deployment
-   - Example: "Diffusion Demo Deployment"
-   - Helps track the purpose of different deployments
+### API Integration
 
-3. Click "Finish" to create your deployment
-
-## Step 7: Monitor Deployment Creation
-
-After clicking Finish, you'll be taken to the Deployments dashboard.
-
-![Deployments Dashboard](./assets/image6.png)
-_The deployments dashboard shows your deployment being created_
-
-Here you can see:
-
-1. Your deployment listed (e.g., "diffusion-demo")
-2. The creation status indicator ("Creating")
-3. Deployment details including:
-   - Base model information
-   - Creation timestamp
-   - Creator information
-
-Key Features of the Dashboard:
-
-- Search bar for finding specific deployments
-- Status indicators for each deployment
-- Detailed information about each deployment
-- Options to manage existing deployments
-
-### Deployment States
-
-Your deployment will go through several states:
-
-1. Creating (as shown in the screenshot)
-2. Provisioning
-3. Ready (when it's available for use)
-
-Wait for the deployment to reach the "Ready" state before attempting to use it.
-
-## Step 8: Connect model to backend
-
-Click on the model.
-
-![Model Page](./assets/image7.png)
-_The model page shows information about your deployed model_
-
-In the **Name** section, you'll see something like
+Add the following variables to your `.env.local` and `.env` files using the example below
 
 ```bash
-accounts/grand-hunter-dark-15-e508c0/deployments/9780c165
+RUNPOD_API_KEY="rpa_I28Q0GTNKBXHgdsfgdsfgdsgdsg [should be the API key you created above]"
+RUNPOD_API_URL="https://api.runpod.ai/v2/adfsfsafs/runsync [should be the endpoint you found above]"
 ```
 
-In this, grand-hunter-dark-15-e508c0 is the ACCOUNT_ID and 9780c165 is the MODEL_ID.
 
-In `app/api/generate/route.ts`, replace
+## Best Practices
 
-```bash
-https://api.fireworks.ai/inference/v1/workflows/accounts/fireworks/models/stable-diffusion-3p5-large-turbo/text_to_image'
-```
+1. **Worker Configuration**:
+   - Start with minimum active workers (0) for cost efficiency
+   - Set reasonable max workers based on expected load
+   - Enable FlashBoot for faster scaling
 
-with
+2. **Resource Management**:
+   - Choose GPU size based on model requirements
+   - Consider availability vs. cost tradeoffs
+   - Monitor usage metrics for optimization
 
-```bash
-https://api.fireworks.ai/inference/v1/workflows/accounts/<ACCOUNT_ID>/deployedModels/<MODEL_ID>/text_to_image
-```
+3. **Execution Settings**:
+   - Set appropriate timeouts based on workload
+   - Configure memory limits based on model size
+   - Use environment variables for sensitive data
 
-Now your app is connected to the new model!
+4. **Security**:
+   - Never share your API keys
+   - Rotate keys periodically
+   - Use environment variables for key storage
+
+5. **Usage**:
+   - Monitor key usage regularly
+   - Create separate keys for different projects
+   - Disable unused keys
+
+6. **Integration**:
+   - Use the provided endpoint URL format
+   - Include proper error handling
+   - Implement request timeouts
+
+## Cost Optimization
+
+- Monitor the Rolling Average spend ($0.24/day in example)
+- Use minimum required GPU size
+- Leverage FlashBoot for faster cold starts
+- Set appropriate idle timeouts
+- Consider availability levels based on needs
 
 ---
-
-_Note: The screenshots show the exact interfaces you'll encounter during deployment creation and management. Follow along with each screen as you create and manage your deployment._
-
-← [Frontend](./frontend.md)
+← [Previous](./setup.md) | [Next](./backend.md)

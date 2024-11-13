@@ -10,136 +10,127 @@ Create a new file `app/page.tsx`:
 import type { GenerationSettings } from '@/components/ImageGenerator';
 import ImageGenerator from '@/components/ImageGenerator';
 import { useState } from 'react';
-```
-
-**What's happening here?**
-- Marking as client component
-- Importing our ImageGenerator and its types
-- Importing useState for managing local state
-
-## Step 2: Component Shell and State Setup
-
-Add the component structure and state:
-
-```typescript
-// Previous imports...
 
 export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
+    return (
+        <div>Main Page</div>
+    );
 }
 ```
 
 **What's happening here?**
-- Creating the main page component
-- Setting up loading state for image generation
-- Setting up error state for handling failures
+- Setting up client-side component with 'use client'
+- Importing GenerationSettings type and ImageGenerator component
+- Importing useState hook for state management
 
-## Step 3: Image Generation Handler
+## Step 2: Adding Component State
 
-Add the function that handles image generation:
+Add state management for loading and errors:
 
 ```typescript
 export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-  const generateImage = async (settings: GenerationSettings) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: settings.prompt,
-          num_inference_steps: settings.numInferenceSteps,
-          guidance_scale: settings.guidanceScale,
-          aspect_ratio: settings.aspectRatio,
-          accept: settings.accept
-        }),
-      });
-    }
-  }
-
+    return (
+        <div>Main Page</div>
+    );
 }
+```
+
+**What's happening here?**
+- Adding loading state for generation process
+- Adding error state for error handling
+- Using TypeScript for proper type definitions
+
+## Step 3: Implementing Generate Function
+
+Add the image generation handler:
+
+```typescript
+    const generateImage = async (settings: GenerationSettings) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    prompt: settings.prompt,
+                    num_inference_steps: settings.numInferenceSteps,
+                    guidance_scale: settings.guidanceScale,
+                    aspect_ratio: settings.aspectRatio,
+                    accept: settings.accept
+                }),
+            });
 ```
 
 **What's happening here?**
 - Creating async function to handle image generation
 - Setting loading state and clearing previous errors
-- Making POST request to our API endpoint
-- Sending all generation settings in the request body
+- Making POST request to generate API endpoint
+- Formatting request body with generation settings
 
-## Step 4: Error Handling
+## Step 4: Adding Response Handling
 
-Add error handling for the API response:
+Add error handling and response processing:
 
 ```typescript
-  const generateImage = async (settings: GenerationSettings) => {
-    try {
-      // Previous fetch code...
+    const generateImage = async (settings: GenerationSettings) => {
+        try {
+            // Previous fetch code...
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to generate image');
-      }
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to generate image');
+            }
 
-      const imageBlob = await response.blob();
-      return URL.createObjectURL(imageBlob);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to generate image';
-      setError(message);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+            const imageBlob = await response.blob();
+            return URL.createObjectURL(imageBlob);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to generate image';
+            setError(message);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
 ```
 
 **What's happening here?**
-- Checking if response was successful
-- Converting error response to proper Error object
-- Converting successful response to blob and creating URL
-- Handling any errors that occur during the process
-- Ensuring loading state is always reset
+- Checking response status and handling errors
+- Converting successful response to blob
+- Creating object URL for the image
+- Setting error message on failure
+- Ensuring loading state is reset
 
-## Step 5: Component Layout
+## Step 5: Adding Component Layout
 
-Finally, add the component's JSX:
+Add the component's JSX structure:
 
 ```typescript
-export default function Home() {
-  // Previous state and function...
-
-  return (
-    <div className="min-h-screen bg-white">
-      <main className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-8">Image Generator</h1>
-        <ImageGenerator 
-          onGenerate={generateImage} 
-          isLoading={loading}
-          error={error}
-        />
-      </main>
-    </div>
-  );
-}
+    return (
+        <div className="min-h-screen bg-white">
+            <main className="container mx-auto py-8">
+                <h1 className="text-3xl font-bold mb-8">Image Generator</h1>
+                <ImageGenerator 
+                    onGenerate={generateImage} 
+                    isLoading={loading}
+                    error={error}
+                />
+            </main>
+        </div>
+    );
 ```
 
-## Step 6
-
-Run
-
-```bash
-npm run dev
-```
-
-and navigate to https://localhost:3000 to view and interact with your app
+**What's happening here?**
+- Creating full-height page layout
+- Adding centered container for content
+- Including page title
+- Rendering ImageGenerator component with props
 
 ---
-← [Component](./component.md) | [Deploy →](./deploy.md)
+← [Component](./component.md)
