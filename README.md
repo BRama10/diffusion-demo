@@ -61,11 +61,6 @@ The application will be available at `http://localhost:3000`.
 
 ## Configuration
 
-### Environment Variables
-
-Required environment variables:
-- `FIREWORKS_API_KEY`: Your Fireworks AI API key
-
 ### Generation Parameters
 
 The application supports customization of:
