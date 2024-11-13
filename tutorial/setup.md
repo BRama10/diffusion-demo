@@ -218,4 +218,4 @@ npm install lucide-react zod
 Now your project is set up and ready for building the image generation application!
 
 ---
-[Backend →](./backend.md)
+[Deploy →](./deploy.md)
