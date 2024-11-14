@@ -178,7 +178,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                                 <select
                                     value={settings.aspectRatio}
                                     onChange={(e) => setSettings({ ...settings, aspectRatio: e.target.value })}
-                                    className="mt-1 w-full p-2 border border-gray-300 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-orange-200 focus:border-orange-400 transition-colors"
+                                    className="mt-1 w-full p-2 border border-gray-300 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-orange-200 focus:border-orange-400 transition-colors !text-black"
                                 >
                                     <option className='!text-black' value="16:9">16:9</option>
                                     <option className='!text-black' value="1:1">1:1</option>
@@ -260,7 +260,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                                 <select
                                     value={settings.accept}
                                     onChange={(e) => setSettings({ ...settings, accept: e.target.value as ("image/jpeg" | "image/png") })}
-                                    className="className='!text-black' mt-1 w-full p-2 border border-gray-300 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-orange-200 focus:border-orange-400 transition-colors"
+                                    className="className='!text-black' mt-1 w-full p-2 border border-gray-300 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-orange-200 focus:border-orange-400 transition-colors !text-black"
                                 >
                                     <option className='!text-black' value="image/jpeg">JPEG</option>
                                     <option className='!text-black' value="image/png">PNG</option>
