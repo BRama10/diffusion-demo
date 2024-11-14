@@ -156,15 +156,15 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                                     onChange={(e) => setSettings({ ...settings, aspectRatio: e.target.value })}
                                     className="mt-1 w-full p-2 border border-gray-300 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-orange-200 focus:border-orange-400 transition-colors"
                                 >
-                                    <option value="16:9">16:9</option>
-                                    <option value="1:1">1:1</option>
-                                    <option value="21:9">21:9</option>
-                                    <option value="2:3">2:3</option>
-                                    <option value="3:2">3:2</option>
-                                    <option value="4:5">4:5</option>
-                                    <option value="5:4">5:4</option>
-                                    <option value="9:16">9:16</option>
-                                    <option value="9:21">9:21</option>
+                                    <option className='!text-black' value="16:9">16:9</option>
+                                    <option className='!text-black' value="1:1">1:1</option>
+                                    <option className='!text-black' value="21:9">21:9</option>
+                                    <option className='!text-black' value="2:3">2:3</option>
+                                    <option className='!text-black' value="3:2">3:2</option>
+                                    <option className='!text-black' value="4:5">4:5</option>
+                                    <option className='!text-black' value="5:4">5:4</option>
+                                    <option className='!text-black' value="9:16">9:16</option>
+                                    <option className='!text-black' value="9:21">9:21</option>
                                 </select>
                             </div>
 
@@ -236,10 +236,10 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                                 <select
                                     value={settings.accept}
                                     onChange={(e) => setSettings({ ...settings, accept: e.target.value as ("image/jpeg" | "image/png") })}
-                                    className="mt-1 w-full p-2 border border-gray-300 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-orange-200 focus:border-orange-400 transition-colors"
+                                    className="className='!text-black' mt-1 w-full p-2 border border-gray-300 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-orange-200 focus:border-orange-400 transition-colors"
                                 >
-                                    <option value="image/jpeg">JPEG</option>
-                                    <option value="image/png">PNG</option>
+                                    <option className='!text-black' value="image/jpeg">JPEG</option>
+                                    <option className='!text-black' value="image/png">PNG</option>
                                 </select>
                             </div>
                         </div>
