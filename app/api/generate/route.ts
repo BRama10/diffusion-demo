@@ -8,46 +8,77 @@ const requestSchema = z.object({
     aspect_ratio: z.string().min(1),
 });
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function makeRunPodRequest(validatedData: z.infer<typeof requestSchema>, maxRetries = 3) {
+    let lastError: any;
+    
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+            const response = await fetch(
+                `${process.env.RUNPOD_API_URL}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${process.env.RUNPOD_API_KEY}`,
+                    },
+                    body: JSON.stringify({
+                        input: {
+                            prompt: validatedData.prompt,
+                            num_inference_steps: validatedData.num_inference_steps,
+                            guidance_scale: validatedData.guidance_scale,
+                            aspect_ratio: validatedData.aspect_ratio
+                        }
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.log(`RunPod API error (attempt ${attempt + 1}/${maxRetries}):`, error);
+                lastError = error;
+                
+                if (attempt < maxRetries - 1) {
+                    console.log(`Retrying in 3 seconds...`);
+                    await sleep(3000); // Wait 3 seconds before retrying
+                    continue;
+                }
+                
+                throw new Error(error.message || 'Failed to generate image');
+            }
+
+            const result = await response.json();
+            console.log('RunPod response time metrics:', {
+                delayTime: result.delayTime,
+                executionTime: result.executionTime,
+                id: result.id
+            });
+
+            return result;
+        } catch (error) {
+            lastError = error;
+            
+            if (attempt < maxRetries - 1) {
+                console.log(`Request failed (attempt ${attempt + 1}/${maxRetries}). Retrying in 3 seconds...`);
+                await sleep(3000); // Wait 3 seconds before retrying
+                continue;
+            }
+            
+            throw error;
+        }
+    }
+
+    throw lastError;
+}
+
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const validatedData = requestSchema.parse(body);
         console.log('Validated request:', validatedData);
 
-        const response = await fetch(
-            `${process.env.RUNPOD_API_URL}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.RUNPOD_API_KEY}`,
-                },
-                body: JSON.stringify({
-                    input: {
-                        prompt: validatedData.prompt,
-                        num_inference_steps: validatedData.num_inference_steps,
-                        guidance_scale: validatedData.guidance_scale,
-                        aspect_ratio: validatedData.aspect_ratio
-                    }
-                }),
-            }
-        );
-
-        if (!response.ok) {
-            const error = await response.json();
-            console.log('RunPod API error:', error);
-            return NextResponse.json(
-                { error: error.message || 'Failed to generate image' },
-                { status: response.status }
-            );
-        }
-
-        const result = await response.json();
-        console.log('RunPod response time metrics:', {
-            delayTime: result.delayTime,
-            executionTime: result.executionTime,
-            id: result.id
-        });
+        const result = await makeRunPodRequest(validatedData);
 
         // Convert base64 to buffer
         const imageBuffer = Buffer.from(result.output, 'base64');
