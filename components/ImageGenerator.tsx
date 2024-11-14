@@ -23,6 +23,19 @@ interface ImageGeneratorProps {
     error?: string | null;
 }
 
+const GENERATION_TIPS = [
+    "Try using descriptive adjectives to specify the style, like 'ethereal', 'vibrant', or 'minimalist'",
+    "Include specific lighting details like 'golden hour', 'soft diffused light', or 'dramatic shadows'",
+    "Mention artistic mediums for different styles: 'oil painting', 'watercolor', 'digital art', '3D render'",
+    "Add camera angles or perspectives like 'close-up', 'aerial view', or 'wide-angle shot'",
+    "Specify the mood or atmosphere: 'serene', 'mysterious', 'joyful', 'dramatic'",
+    "Include time period references: 'futuristic', 'vintage', 'medieval', 'cyberpunk'",
+    "Reference specific art styles: 'impressionist', 'art deco', 'surrealist', 'pop art'",
+    "Combine multiple concepts but keep them coherent and related to your main subject",
+    "Use color palettes in your prompt: 'pastel colors', 'monochromatic', 'bold contrasting colors'",
+    "Specify materials and textures: 'glossy', 'matte', 'metallic', 'rough stone', 'smooth glass'"
+];
+
 const ImageGenerator: React.FC<ImageGeneratorProps> = ({
     onGenerate,
     isLoading = false,
@@ -39,6 +52,15 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
 
+    const getRandomTip = () => {
+        const randomIndex = Math.floor(Math.random() * GENERATION_TIPS.length);
+        return GENERATION_TIPS[randomIndex];
+    };
+
+    const [currentTip, setCurrentTip] = useState(getRandomTip());
+
+    
+
     useEffect(() => {
         return () => {
             // Cleanup URLs when component unmounts
@@ -50,6 +72,8 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
 
     const handleGenerate = async () => {
         try {
+            setCurrentTip(getRandomTip());
+
             const newImageUrl = await onGenerate(settings);
 
             const newImage: GeneratedImage = {
@@ -253,8 +277,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                                     Generation Tips
                                 </h4>
                                 <p className="mt-1 text-sm text-orange-700">
-                                    For best results, try to be specific in your prompts and
-                                    experiment with different guidance scales.
+                                    {currentTip}
                                 </p>
                             </div>
                         </div>
