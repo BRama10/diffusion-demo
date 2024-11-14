@@ -72,8 +72,6 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
 
     const handleGenerate = async () => {
         try {
-            setCurrentTip(getRandomTip());
-
             const newImageUrl = await onGenerate(settings);
 
             const newImage: GeneratedImage = {
@@ -85,6 +83,8 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
 
             setImageUrl(newImageUrl);
             setGeneratedImages(prev => [newImage, ...prev]);
+
+            setCurrentTip(getRandomTip());
         } catch (err) {
             console.error('Error generating image:', err);
         }
